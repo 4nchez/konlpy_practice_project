@@ -28,16 +28,19 @@ PyTorch Tensor 변환
  
 ```
 project/
-├── main.py                # 전체 파이프라인 실행 진입점
-├── text_collector.py      # 뉴스 크롤링 + 텍스트 정제
-├── wordcloud_generator.py # 형태소 분석 · 빈도 계산 · 시각화
-├── report_generator.py    # Markdown 보고서 생성
-├── README.md              # 프로젝트 설명 (이 파일)
+├── main.py                    # 전체 파이프라인 실행 진입점
+├── README.md                  # 프로젝트 설명 (이 파일)
+│
+├── src/
+│   ├── text_collector.py      # 뉴스 크롤링 + 텍스트 정제
+│   ├── wordcloud_generator.py # 형태소 분석 · 빈도 계산 · 시각화
+│   └── report_generator.py    # Markdown 보고서 생성
 │
 └── (실행 후 생성)
-    ├── wordcloud.png      # 워드클라우드 이미지
-    ├── top_words.png      # 상위 20개 단어 빈도 차트
-    └── report.md          # 분석 보고서 (워드클라우드 인라인 포함)
+    └── report/
+        ├── wordcloud.png      # 워드클라우드 이미지
+        ├── top_words.png      # 상위 20개 단어 빈도 차트
+        └── report.md          # 분석 보고서 (이미지 상대 경로 참조)
 ```
  
 ---

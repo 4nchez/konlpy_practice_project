@@ -1,18 +1,5 @@
-import base64
 from datetime import datetime
 from pathlib import Path
-
-
-def _img_to_base64(image_path: str) -> str | None:
-    """이미지 파일을 Base64 data URI로 변환합니다."""
-    p = Path(image_path)
-    if not p.exists():
-        return None
-    with open(p, "rb") as f:
-        encoded = base64.b64encode(f.read()).decode("utf-8")
-    ext = p.suffix.lower().lstrip(".")
-    mime = "image/png" if ext == "png" else f"image/{ext}"
-    return f"data:{mime};base64,{encoded}"
 
 
 def generate_report(
@@ -22,12 +9,12 @@ def generate_report(
     word_freq: dict[str, int],
     wordcloud_path: str,
     top_words_path: str,
-    output_path: str = "report.md",
+    output_path: str = "report/report.md",
     top_n: int = 20,
 ) -> str:
     """
     분석 결과를 Markdown 보고서로 작성합니다.
-    워드클라우드 이미지는 Base64로 인코딩하여 Markdown에 인라인 삽입합니다.
+    이미지는 report/ 폴더 내 파일명만 상대 경로로 참조합니다.
 
     반환값: 저장된 보고서 파일 경로
     """
@@ -40,20 +27,8 @@ def generate_report(
     avg_freq = total_tokens / unique_words if unique_words else 0
     top5_words = [w for w, _ in top_words[:5]]
 
-    # 이미지 Base64 변환
-    wc_b64 = _img_to_base64(wordcloud_path)
-    top_b64 = _img_to_base64(top_words_path)
-
-    wc_md = (
-        f"![워드클라우드]({wc_b64})"
-        if wc_b64
-        else f"> 이미지 파일을 찾을 수 없습니다: `{wordcloud_path}`"
-    )
-    top_md = (
-        f"![상위 단어 차트]({top_b64})"
-        if top_b64
-        else f"> 이미지 파일을 찾을 수 없습니다: `{top_words_path}`"
-    )
+    wc_filename  = Path(wordcloud_path).name
+    top_filename = Path(top_words_path).name
 
     # 상위 단어 테이블 행
     table_rows = "\n".join(
@@ -117,13 +92,13 @@ def generate_report(
 
 ## 5. 워드클라우드
 
-{wc_md}
+![워드클라우드]({wc_filename})
 
 ---
 
 ## 6. 상위 {top_n}개 단어 빈도
 
-{top_md}
+![상위 단어 차트]({top_filename})
 
 ### 상세 데이터
 
@@ -147,6 +122,7 @@ def generate_report(
 """
 
     output = Path(output_path)
+    output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(md.strip(), encoding="utf-8")
 
     # print(md.strip())
